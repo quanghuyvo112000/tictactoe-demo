@@ -1,0 +1,18 @@
+.board {
+  justify-content: center;
+  flex-wrap: wrap;
+  display: flex;
+  width: 305px;
+}
+
+.board > .cell {
+  width: 100px;
+  height: 100px;
+  padding: 1rem;
+  margin: .03rem;
+  border: 2px solid #eeeeee;
+}
+
+.board > .cell:hover {
+  background-color: #dddbdb;
+}
