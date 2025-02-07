@@ -7,8 +7,8 @@ import { Player } from "./types";
 type GameState = {
   board: (Player | null)[];
   currentPlayer: Player;
-  winner: Player | null;
-  score: { X: number; O: number };
+  winner: Player | "Draw" | null;
+  score: { X: number; O: number; draws: 0 };
 };
 
 const TicTacToe: React.FC = () => {
@@ -16,7 +16,7 @@ const TicTacToe: React.FC = () => {
     board: Array(9).fill(null),
     currentPlayer: "X",
     winner: null,
-    score: { X: 0, O: 0 },
+    score: { X: 0, O: 0, draws: 0 },
   });
 
   const handleClick = (index: number) => {
@@ -26,17 +26,24 @@ const TicTacToe: React.FC = () => {
     newBoard[index] = state.currentPlayer;
 
     const winner = checkWinner(newBoard);
+    const isDraw = newBoard.every((cell) => cell !== null);
     const newScore = { ...state.score };
-    if (winner) newScore[winner]++;
+
+    if (winner) {
+      newScore[winner]++;
+    } else if (isDraw) {
+      newScore.draws++; // Tăng số trận hòa
+    }
 
     setState({
       board: newBoard,
-      currentPlayer: winner
-        ? state.currentPlayer
-        : state.currentPlayer === "X"
-        ? "O"
-        : "X",
-      winner,
+      currentPlayer:
+        winner || isDraw
+          ? state.currentPlayer
+          : state.currentPlayer === "X"
+          ? "O"
+          : "X",
+      winner: winner || (isDraw ? "Draw" : null),
       score: newScore,
     });
   };
@@ -54,10 +61,14 @@ const TicTacToe: React.FC = () => {
     <div className="game-container">
       <h1>Tic Tac Toe</h1>
       {state.winner ? (
-        <h2 className="m-2">Winner: {state.winner}</h2>
+        state.winner === "Draw" ? (
+          <h2 className="m-2 text-secondary">Game is a Draw!</h2>
+        ) : (
+          <h2 className="m-2">Winner: {state.winner}</h2>
+        )
       ) : (
         <h2>
-          Next Player:{" "}
+          Player:{" "}
           <span
             style={{
               color:
